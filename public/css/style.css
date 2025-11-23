@@ -1,6 +1,6 @@
 body {
     font-family: sans-serif;
-    background-color: #f4f4f4;
+    background-color: #333232;
     color: #333;
     line-height: 1.6;
 }
@@ -34,4 +34,32 @@ body {
 
 .card-body {
     padding: 15px;
+}
+
+h1,
+h2 {
+    line-height: 1.2;
+    color: #1a1a1a;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
