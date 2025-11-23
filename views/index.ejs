@@ -3,7 +3,7 @@
     <div class="post-container">
         <% salesPosts.forEach(post=> { %>
             <!-- Each post is a clickable card -->
-            <a href="/posts/<%= post.id %>" class="card">
+            <a href="/view/posts/<%= post.id %>" class="card">
                 <img src="<%= post.image %>" alt="Bike for sale posted by <%= post.authorName %>" class="card-img">
                 <div class="card-body">
                     <h4>

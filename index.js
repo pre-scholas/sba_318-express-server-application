@@ -1,11 +1,7 @@
 import express from 'express';
 import users from './data/users.js';
 import posts from './data/posts.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = 3000;
 
@@ -37,10 +33,7 @@ app.get('/users', (req, res) => {
   res.json(users);
 });
 
-// A route to render a page with all users
-app.get('/users/list', (req, res) => {
-  res.render('users', { users: users, title: 'All Users' });
-});
+
 
 // A simple GET route to see all posts, with optional filtering by userId
 app.get('/posts', (req, res) => {
@@ -58,23 +51,27 @@ app.get('/posts', (req, res) => {
   }
 });
 
+// GET a single user by ID
+app.get('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const user = users.find(u => u.id === userId);
+  
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404).json({ error: 'User not found' });
+  }
+});
+
 // GET a single post by ID
 app.get('/posts/:id', (req, res) => {
-  // 1. Get the id from the URL params. It's a string, so we need to parse it to an integer.
   const postId = parseInt(req.params.id);
-
-  // 2. Find the post in the 'posts' array
-  const post = posts.find((p) => p.id === postId);
-
-  // 3. If the post is found, send it. Otherwise, send a 404 error.
+  const post = posts.find(p => p.id === postId);
+  
   if (post) {
-    // 4. Find the author of the post using the userId from the post
-    const author = users.find(user => user.id === post.userId);
-
-    // 5. Render the template, passing both the post and the author
-    res.render('post', { post: post, author: author, title: 'Post Details' });
+    res.json(post);
   } else {
-    res.status(404).send('Post not found'); // Or render a 404 page
+    res.status(404).json({ error: 'Post not found' });
   }
 });
 
@@ -106,26 +103,133 @@ app.post('/users', (req, res) => {
   res.status(201).json(newUser);
 });
 
-// PATCH route to update a user's details
+// POST route to create a new post
+app.post('/posts', (req, res) => {
+  const { userId, bikeDescription, price, image } = req.body;
+  
+  if (!userId || !bikeDescription || !price) {
+    return res.status(400).json({ error: 'Missing required fields: userId, bikeDescription, price' });
+  }
+  
+  const newId = posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1;
+  const newPost = { id: newId, userId, bikeDescription, price, image };
+  
+  posts.push(newPost);
+  res.status(201).json(newPost);
+});
+
+// PUT route to update a user completely
+app.put('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  const { name, username, email } = req.body;
+  if (!name || !username || !email) {
+    return res.status(400).json({ error: 'Missing required fields: name, username, email' });
+  }
+  
+  users[userIndex] = { id: userId, name, username, email };
+  res.json(users[userIndex]);
+});
+
+// PATCH route to update a user partially
 app.patch('/users/:id', (req, res) => {
-  // 1. Get the user ID from params and find the user
   const userId = parseInt(req.params.id);
   const user = users.find(u => u.id === userId);
-
+  
   if (!user) {
-    return res.status(404).json({ error: `User with ID ${userId} not found.` });
+    return res.status(404).json({ error: 'User not found' });
   }
-
-  // 2. Get the potential updates from the request body
+  
   const { name, username, email } = req.body;
-
-  // 3. Update user fields if they are provided in the request
   if (name) user.name = name;
   if (username) user.username = username;
   if (email) user.email = email;
-
-  // 4. Respond with the updated user
+  
   res.json(user);
+});
+
+// PUT route to update a post completely
+app.put('/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const postIndex = posts.findIndex(p => p.id === postId);
+  
+  if (postIndex === -1) {
+    return res.status(404).json({ error: 'Post not found' });
+  }
+  
+  const { userId, bikeDescription, price, image } = req.body;
+  if (!userId || !bikeDescription || !price) {
+    return res.status(400).json({ error: 'Missing required fields: userId, bikeDescription, price' });
+  }
+  
+  posts[postIndex] = { id: postId, userId, bikeDescription, price, image };
+  res.json(posts[postIndex]);
+});
+
+// PATCH route to update a post partially
+app.patch('/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const post = posts.find(p => p.id === postId);
+  
+  if (!post) {
+    return res.status(404).json({ error: 'Post not found' });
+  }
+  
+  const { userId, bikeDescription, price, image } = req.body;
+  if (userId) post.userId = userId;
+  if (bikeDescription) post.bikeDescription = bikeDescription;
+  if (price) post.price = price;
+  if (image) post.image = image;
+  
+  res.json(post);
+});
+
+// DELETE route to delete a user
+app.delete('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  users.splice(userIndex, 1);
+  res.status(204).send();
+});
+
+// DELETE route to delete a post
+app.delete('/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const postIndex = posts.findIndex(p => p.id === postId);
+  
+  if (postIndex === -1) {
+    return res.status(404).json({ error: 'Post not found' });
+  }
+  
+  posts.splice(postIndex, 1);
+  res.status(204).send();
+});
+
+// View routes (separate from API)
+app.get('/view/users', (req, res) => {
+  res.render('users', { users: users, title: 'All Users' });
+});
+
+app.get('/view/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const post = posts.find(p => p.id === postId);
+  
+  if (post) {
+    const author = users.find(user => user.id === post.userId);
+    res.render('post', { post: post, author: author, title: 'Post Details' });
+  } else {
+    res.status(404).send('Post not found');
+  }
 });
 
 app.listen(PORT, () => {
