@@ -4,6 +4,8 @@
         <% users.forEach(user => { %>
             <li>
                 <strong><%= user.name %></strong> (<%= user.username %>) - <%= user.email %>
+                <br>
+                <a href="/view/users/<%= user.id %>/posts">View Posts</a>
             </li>
         <% }) %>
     </ul>

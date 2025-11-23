@@ -220,6 +220,18 @@ app.get('/view/users', (req, res) => {
   res.render('users', { users: users, title: 'All Users' });
 });
 
+app.get('/view/users/:id/posts', (req, res) => {
+  const userId = parseInt(req.params.id);
+  const user = users.find(u => u.id === userId);
+  const userPosts = posts.filter(p => p.userId === userId);
+  
+  if (user) {
+    res.render('index', { salesPosts: userPosts.map(post => ({...post, authorName: user.name})), title: `${user.name}'s Posts` });
+  } else {
+    res.status(404).send('User not found');
+  }
+});
+
 app.get('/view/posts/:id', (req, res) => {
   const postId = parseInt(req.params.id);
   const post = posts.find(p => p.id === postId);
