@@ -1,3 +1,22 @@
-<h1>
-    <% = salesPosts.
-</h1>
+<%- include('partials/header') %>
+    <h1>All Sales Posts</h1>
+    <div class="post-container">
+        <% salesPosts.forEach(post=> { %>
+            <!-- Each post is a clickable card -->
+            <a href="/posts/<%= post.id %>" class="card">
+                <img src="<%= post.image %>" alt="Bike for sale posted by <%= post.authorName %>" class="card-img">
+                <div class="card-body">
+                    <h4>
+                        <%= post.price %>
+                    </h4>
+                    <p><strong>Sold by:</strong>
+                        <%= post.authorName %>
+                    </p>
+                    <p>
+                        <%= post.bikeDescription.substring(0, 80) %>...
+                    </p>
+                </div>
+            </a>
+            <% }) %>
+    </div>
+    <%- include('partials/footer') %>

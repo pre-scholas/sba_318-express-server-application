@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+    <% if (post) { %>
+        <h1>Post Details</h1>
+        <% if (post.image) { %>
+            <img src="<%= post.image %>" alt="Bike for sale" width="400">
+        <% } %>
+        <h2>Price: <%= post.price %></h2>
+        <% if (author) { %>
+            <p><strong>Posted by:</strong> <%= author.name %></p>
+        <% } else { %>
+            <p><strong>Posted by:</strong> An unknown user</p>
+        <% } %>
+        <p><strong>Description:</strong></p>
+        <pre><%= post.bikeDescription %></pre>
+        <a href="/">Back to all posts</a>
+    <% } %>
+<%- include('partials/footer') %>
