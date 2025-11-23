@@ -3,8 +3,10 @@ import express from 'express';
 import userRoutes from './routes/users.js';
 import postRoutes from './routes/post.js';
 
-const app = express();
+const app = express(); 
 const port = 3000;
+
+app.set('view engine', 'ejs');
 
 // Middleware for parsing JSON and urlencoded data
 app.use(express.json());
@@ -22,9 +24,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 
 // Root route
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+app.get('/', (req, res) =>
+  res.render('index')
+);
 
 // 404 handler for unmatched routes
 app.use((req, res) => {
